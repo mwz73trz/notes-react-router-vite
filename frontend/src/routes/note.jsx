@@ -1,8 +1,25 @@
-import { Form, useLoaderData } from "react-router-dom";
+import { Form, useLoaderData, useFetcher } from "react-router-dom";
 import noteAPI from "../api/noteAPI";
 
+export async function action({ request, params }) {
+  let formData = await request.formData();
+  console.log(formData);
+  return noteAPI.updateNote(params.noteId, {
+    title: formData.get("title"),
+    content: formData.get("content"),
+    favorite: formData.get("favorite") === "true",
+  });
+}
+
 export async function loader({ params }) {
-  return noteAPI.getSingleNote(params.noteId);
+  const note = await noteAPI.getSingleNote(params.noteId);
+  if (!note) {
+    throw new Response("", {
+      status: 404,
+      statusText: "Not Found",
+    });
+  }
+  return note;
 }
 
 export default function Note() {
@@ -38,10 +55,16 @@ export default function Note() {
 }
 
 function Favorite({ note }) {
+  const fetcher = useFetcher();
   let favorite = note.favorite;
+  if (fetcher.formData) {
+    favorite = fetcher.formData.get("favorite") === "true";
+  }
 
   return (
-    <Form method="post">
+    <fetcher.Form method="post">
+      <input type="hidden" name="title" defaultValue={note.title} />
+      <input type="hidden" name="content" defaultValue={note.content} />
       <button
         name="favorite"
         value={favorite ? "false" : "true"}
@@ -49,6 +72,6 @@ function Favorite({ note }) {
       >
         {favorite ? "★" : "☆"}
       </button>
-    </Form>
+    </fetcher.Form>
   );
 }

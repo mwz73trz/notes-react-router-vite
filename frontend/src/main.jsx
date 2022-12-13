@@ -8,6 +8,8 @@ import Root, {
 } from "./routes/root";
 import ErrorPage from "./error-page";
 import Note, { loader as noteLoader } from "./routes/note";
+import EditNote, { action as editAction } from "./routes/edit";
+import CreateNote, { action as addAction } from "./routes/add";
 
 const router = createBrowserRouter([
   {
@@ -21,6 +23,18 @@ const router = createBrowserRouter([
         path: "notes/:noteId",
         element: <Note />,
         loader: noteLoader,
+      },
+      {
+        path: "notes/add",
+        element: <CreateNote />,
+        loader: noteLoader,
+        action: addAction,
+      },
+      {
+        path: "notes/:noteId/edit",
+        element: <EditNote />,
+        loader: noteLoader,
+        action: editAction,
       },
     ],
   },

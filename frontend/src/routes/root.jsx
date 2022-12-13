@@ -1,9 +1,16 @@
-import { Outlet, Link, useLoaderData, Form } from "react-router-dom";
+import {
+  Outlet,
+  NavLink,
+  useLoaderData,
+  Form,
+  redirect,
+  useNavigation,
+} from "react-router-dom";
 import noteAPI from "../api/noteAPI";
 
 export async function action() {
   const note = await noteAPI.createNote();
-  return { note };
+  return redirect(`/notes/add`);
 }
 
 export async function loader() {
@@ -13,6 +20,7 @@ export async function loader() {
 
 export default function Root() {
   const { notes } = useLoaderData();
+  const navigation = useNavigation();
   return (
     <>
       <div id="sidebar">
@@ -38,10 +46,15 @@ export default function Root() {
             <ul>
               {notes.map((note) => (
                 <li key={note.id}>
-                  <Link to={`notes/${note.id}`}>
+                  <NavLink
+                    to={`notes/${note.id}`}
+                    className={({ isActive, isPending }) =>
+                      isActive ? "active" : isPending ? "pending" : ""
+                    }
+                  >
                     {note.title ? <>{note.title}</> : <i>No Note</i>}{" "}
                     {note.favorite && <span>★</span>}
-                  </Link>
+                  </NavLink>
                 </li>
               ))}
             </ul>
@@ -52,7 +65,10 @@ export default function Root() {
           )}
         </nav>
       </div>
-      <div id="detail">
+      <div
+        id="detail"
+        className={navigation.state === "loading" ? "loading" : ""}
+      >
         <Outlet />
       </div>
     </>

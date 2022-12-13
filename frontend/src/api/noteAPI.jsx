@@ -26,4 +26,14 @@ noteAPI.createNote = async (noteData) => {
   return await tryCatchFetch(() => axios.post(`${BASE_URL}notes/`, noteData));
 };
 
+noteAPI.updateNote = async (noteId, noteData) => {
+  return await tryCatchFetch(() =>
+    axios.put(`${BASE_URL}notes/${noteId}/`, noteData)
+  );
+};
+
+noteAPI.deleteNote = async (noteId) => {
+  return await tryCatchFetch(() => axios.delete(`${BASE_URL}notes/${noteId}/`));
+};
+
 export default noteAPI;
